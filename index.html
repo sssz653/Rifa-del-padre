@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa Dia del Padre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:'Montserrat',sans-serif;
+            background:#0b1a30;
+            color:#fff;
+            min-height:100vh;
+        }
+        .wrap{max-width:800px;margin:0 auto;padding:16px}
+
+        /* Banderin decorativo */
+        .bandera{display:flex;justify-content:center;gap:0;margin-bottom:12px}
+        .bandera span{display:block;height:8px;width:140px}
+        .bandera .c{background:#75AADB}
+        .bandera .b{background:#fff}
+
+        h1{
+            text-align:center;font-size:2.8rem;font-weight:900;
+            letter-spacing:3px;
+            background:linear-gradient(135deg,#75AADB,#fff,#75AADB);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            background-clip:text;
+            margin-bottom:4px;
+        }
+        .sub{
+            text-align:center;font-size:1.4rem;font-weight:700;
+            color:#F5C518;margin-bottom:20px;
+        }
+
+        /* Premios */
+        .premios{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;justify-content:center}
+        .premio{
+            flex:1;min-width:160px;
+            background:rgba(255,255,255,0.08);
+            border:1px solid rgba(255,255,255,0.15);
+            border-radius:14px;padding:16px;text-align:center;
+        }
+        .premio.p1{border-top:4px solid #F5C518}
+        .premio.p2{border-top:4px solid #75AADB}
+        .premio .pos{font-size:1.8rem;font-weight:900;margin-bottom:4px}
+        .premio.p1 .pos{color:#F5C518}
+        .premio.p2 .pos{color:#75AADB}
+        .premio .label{font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-bottom:4px}
+        .premio .name{font-size:1.1rem;font-weight:700}
+        .premio.p1 .name{color:#F5C518}
+        .premio.p2 .name{color:#A8D4F0}
+
+        /* Stats */
+        .stats{display:flex;justify-content:center;gap:40px;margin-bottom:8px}
+        .stat-num{font-size:2rem;font-weight:900}
+        .stat-num.green{color:#2ecc71}
+        .stat-num.red{color:#e74c3c}
+        .stat-lbl{font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.35)}
+
+        .pbar{height:8px;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden;margin-bottom:4px}
+        .pbar-fill{height:100%;background:linear-gradient(90deg,#2ecc71,#75AADB,#e74c3c);transition:width .4s;border-radius:8px}
+        .pbar-txt{text-align:center;font-size:0.75rem;color:rgba(255,255,255,0.3);margin-bottom:18px}
+
+        /* Leyenda */
+        .leyenda{display:flex;justify-content:center;gap:24px;margin-bottom:14px}
+        .leyenda-item{display:flex;align-items:center;gap:6px;font-size:0.85rem;font-weight:700}
+        .ldot{width:20px;height:20px;border-radius:4px}
+        .ldot.libre{background:#fff;border:2px solid #75AADB}
+        .ldot.ocupado{background:#e74c3c;border:2px solid #c0392b}
+
+        /* GRID */
+        .grid-box{
+            background:rgba(255,255,255,0.05);
+            border:1px solid rgba(255,255,255,0.1);
+            border-radius:16px;padding:14px;
+            margin-bottom:16px;
+        }
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(10,1fr);
+            gap:5px;
+        }
+        .celda{
+            aspect-ratio:1;
+            display:flex;align-items:center;justify-content:center;
+            border-radius:8px;
+            font-size:clamp(0.9rem,3.5vw,1.3rem);
+            font-weight:900;
+            cursor:pointer;
+            transition:transform .15s,box-shadow .15s;
+            border:2px solid transparent;
+            -webkit-user-select:none;user-select:none;
+        }
+        .celda.libre{
+            background:#fff;
+            border-color:#75AADB;
+            color:#1a1a2e;
+        }
+        .celda.libre:hover{
+            background:#d4eaf7;
+            transform:scale(1.12);
+            box-shadow:0 0 12px rgba(117,170,219,0.5);
+            z-index:2;
+        }
+        .celda.vendido{
+            background:#e74c3c;
+            border-color:#c0392b;
+            color:#fff;
+            text-decoration:line-through;
+        }
+        .celda.vendido:hover{
+            background:#c0392b;
+            transform:scale(1.12);
+            box-shadow:0 0 12px rgba(192,57,43,0.5);
+            z-index:2;
+        }
+        .celda.pop{animation:pop .35s ease}
+        @keyframes pop{
+            0%{transform:scale(1)}
+            40%{transform:scale(1.3)}
+            70%{transform:scale(.9)}
+            100%{transform:scale(1)}
+        }
+
+        .info{text-align:center;font-size:0.85rem;color:rgba(255,255,255,0.45);margin-bottom:14px}
+        .btn-reset{
+            display:block;margin:0 auto 20px;
+            background:rgba(255,255,255,0.08);
+            border:1px solid rgba(255,255,255,0.12);
+            color:rgba(255,255,255,0.4);
+            padding:10px 24px;border-radius:10px;
+            font-family:'Montserrat',sans-serif;
+            font-size:0.8rem;font-weight:700;
+            cursor:pointer;transition:all .2s;
+        }
+        .btn-reset:hover{background:rgba(231,76,60,0.2);color:#e74c3c;border-color:rgba(231,76,60,0.3)}
+
+        /* Modal */
+        .modal-bg{
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.65);
+            display:none;align-items:center;justify-content:center;
+            z-index:100;
+        }
+        .modal-bg.on{display:flex}
+        .modal{
+            background:#15243d;border:1px solid rgba(255,255,255,0.15);
+            border-radius:18px;padding:28px 24px;
+            max-width:340px;width:90%;text-align:center;
+        }
+        .modal .m-icon{font-size:2.4rem;margin-bottom:10px}
+        .modal .m-title{font-size:1.15rem;font-weight:900;margin-bottom:4px}
+        .modal .m-num{font-size:2.2rem;font-weight:900;color:#F5C518;margin:8px 0 12px}
+        .modal .m-desc{font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:20px}
+        .modal .m-btns{display:flex;gap:10px;justify-content:center}
+        .modal .mbtn{
+            padding:10px 22px;border-radius:10px;
+            font-family:'Montserrat',sans-serif;
+            font-weight:700;font-size:0.85rem;
+            cursor:pointer;border:none;transition:all .2s;
+        }
+        .mbtn.cancel{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1)}
+        .mbtn.cancel:hover{background:rgba(255,255,255,0.15);color:#fff}
+        .mbtn.ok-v{background:#e74c3c;color:#fff}
+        .mbtn.ok-v:hover{background:#c0392b}
+        .mbtn.ok-l{background:#27ae60;color:#fff}
+        .mbtn.ok-l:hover{background:#1e8449}
+
+        /* Toast */
+        .toast{
+            position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+            padding:12px 24px;border-radius:12px;
+            font-weight:700;font-size:0.9rem;
+            z-index:200;opacity:0;transition:all .3s;
+            pointer-events:none;
+        }
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+        .toast.tv{background:rgba(231,76,60,0.9);color:#fff}
+        .toast.tl{background:rgba(46,204,113,0.9);color:#fff}
+
+        footer{text-align:center;color:rgba(255,255,255,0.15);font-size:0.7rem;padding:12px}
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="bandera"><span class="c"></span><span class="b"></span><span class="c"></span></div>
+
+    <h1>RIFA</h1>
+    <div class="sub">&#10084; Dia del Padre &#10084;</div>
+
+    <div class="premios">
+        <div class="premio p1">
+            <div class="pos">1&#176;</div>
+            <div class="label">Premio</div>
+            <div class="name">Picada</div>
+        </div>
+        <div class="premio p2">
+            <div class="pos">2&#176;</div>
+            <div class="label">Premio</div>
+            <div class="name">Box de Desayuno</div>
+        </div>
+    </div>
+
+    <div class="leyenda">
+        <div class="leyenda-item"><div class="ldot libre"></div> Disponible</div>
+        <div class="leyenda-item"><div class="ldot ocupado"></div> Vendido</div>
+    </div>
+
+    <div class="stats">
+        <div style="text-align:center"><div class="stat-num green" id="sDisp">0</div><div class="stat-lbl">Disponibles</div></div>
+        <div style="text-align:center"><div class="stat-num red" id="sVend">0</div><div class="stat-lbl">Vendidos</div></div>
+    </div>
+
+    <div class="pbar"><div class="pbar-fill" id="pFill" style="width:0%"></div></div>
+    <div class="pbar-txt" id="pTxt">0% vendido</div>
+
+    <div class="grid-box">
+        <div class="grid" id="laGrilla"></div>
+    </div>
+
+    <div class="info">Toca un numero disponible para venderlo, o un vendido para liberarlo.</div>
+    <button class="btn-reset" id="btnReset">Reiniciar grilla</button>
+
+    <footer>Rifa Dia del Padre</footer>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg">
+    <div class="modal">
+        <div class="m-icon" id="mIcon"></div>
+        <div class="m-title" id="mTitle"></div>
+        <div class="m-num" id="mNum"></div>
+        <div class="m-desc" id="mDesc"></div>
+        <div class="m-btns">
+            <button class="mbtn cancel" id="mCancel">Cancelar</button>
+            <button class="mbtn" id="mOk">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+
+    // Numeros vendidos segun la imagen (la mayoria estan en rojo)
+    // Disponibles: 07, 30, 59, 72
+    var BASE = [0,1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,60,61,62,63,64,65,66,67,68,69,70,71,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99];
+
+    var CLAVE = 'rifapadrev4';
+    var TOTAL = 100;
+
+    function cargar(){
+        try {
+            var d = localStorage.getItem(CLAVE);
+            if(d){ var a = JSON.parse(d); if(a && a.length>=0) return a; }
+        } catch(e){}
+        return BASE.slice();
+    }
+
+    function guardar(arr){ try{localStorage.setItem(CLAVE,JSON.stringify(arr))}catch(e){} }
+
+    var vendidos = cargar();
+
+    var grilla = document.getElementById('laGrilla');
+    var sDisp = document.getElementById('sDisp');
+    var sVend = document.getElementById('sVend');
+    var pFill = document.getElementById('pFill');
+    var pTxt = document.getElementById('pTxt');
+    var modalBg = document.getElementById('modalBg');
+    var mIcon = document.getElementById('mIcon');
+    var mTitle = document.getElementById('mTitle');
+    var mNum = document.getElementById('mNum');
+    var mDesc = document.getElementById('mDesc');
+    var mOk = document.getElementById('mOk');
+    var mCancel = document.getElementById('mCancel');
+    var toastEl = document.getElementById('toast');
+
+    var pendiente = null;
+
+    function esVendido(n){ return vendidos.indexOf(n) !== -1; }
+
+    function fmt(n){ return n < 10 ? '0'+n : ''+n; }
+
+    function actualizarStats(){
+        var v = vendidos.length;
+        var d = TOTAL - v;
+        sDisp.textContent = d;
+        sVend.textContent = v;
+        var pct = Math.round((v/TOTAL)*100);
+        pFill.style.width = pct+'%';
+        pTxt.textContent = pct+'% vendido';
+    }
+
+    function construirGrilla(){
+        grilla.innerHTML = '';
+        for(var i=0;i<TOTAL;i++){
+            var div = document.createElement('div');
+            div.className = 'celda ' + (esVendido(i)?'vendido':'libre');
+            div.textContent = fmt(i);
+            div.setAttribute('data-n',i);
+            div.onclick = function(){ clicCelda(parseInt(this.getAttribute('data-n'))); };
+            grilla.appendChild(div);
+        }
+        actualizarStats();
+    }
+
+    function actualizarCelda(n){
+        var celdas = grilla.children;
+        if(!celdas || !celdas[n]) return;
+        var c = celdas[n];
+        c.className = 'celda ' + (esVendido(n)?'vendido':'libre') + ' pop';
+        setTimeout(function(){ c.className = c.className.replace(' pop',''); },400);
+        actualizarStats();
+    }
+
+    function clicCelda(n){
+        if(esVendido(n)){
+            mostrarModal('&#128275;','Liberar numero',fmt(n),'Se marcara como disponible.',true);
+            pendiente = function(){
+                var idx = vendidos.indexOf(n);
+                if(idx>-1) vendidos.splice(idx,1);
+                guardar(vendidos);
+                actualizarCelda(n);
+                mostrarToast('Numero '+fmt(n)+' liberado','tl');
+            };
+        } else {
+            mostrarModal('&#128722;','Marcar como vendido',fmt(n),'Se marcara como vendido.',false);
+            pendiente = function(){
+                vendidos.push(n);
+                guardar(vendidos);
+                actualizarCelda(n);
+                mostrarToast('Numero '+fmt(n)+' vendido','tv');
+            };
+        }
+    }
+
+    function mostrarModal(icon,titulo,num,desc,libre){
+        mIcon.innerHTML = icon;
+        mTitle.textContent = titulo;
+        mNum.textContent = num;
+        mDesc.textContent = desc;
+        mOk.className = 'mbtn ' + (libre?'ok-l':'ok-v');
+        mOk.textContent = libre?'Liberar':'Vender';
+        modalBg.className = 'modal-bg on';
+    }
+
+    function cerrarModal(){
+        modalBg.className = 'modal-bg';
+        pendiente = null;
+    }
+
+    mOk.onclick = function(){ if(pendiente) pendiente(); cerrarModal(); };
+    mCancel.onclick = cerrarModal;
+    modalBg.onclick = function(e){ if(e.target===modalBg) cerrarModal(); };
+
+    var toastTimer;
+    function mostrarToast(msg,cls){
+        toastEl.textContent = msg;
+        toastEl.className = 'toast '+cls+' show';
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){ toastEl.className='toast '+cls; },2500);
+    }
+
+    document.getElementById('btnReset').onclick = function(){
+        mostrarModal('&#128260;','Reiniciar grilla','??','Se perderan todos los cambios.',true);
+        pendiente = function(){
+            vendidos = BASE.slice();
+            guardar(vendidos);
+            construirGrilla();
+            mostrarToast('Grilla reiniciada','tl');
+        };
+    };
+
+    // Construir al cargar
+    construirGrilla();
+
+})();
+</script>
+</body>
+</html>
